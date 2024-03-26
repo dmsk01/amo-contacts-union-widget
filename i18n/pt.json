@@ -1,0 +1,34 @@
+{
+  "widget": {
+    "name": "Consolidação de informações",
+    "short_description": "Consolidação de informações",
+    "description": "Consolidação de informações de transações duplicadas. Se houver vários negócios ativos para o mesmo contato em funis diferentes, os dados desses funis serão combinados",
+    "tour_description": "Consolidação de informações de transações duplicadas. Se houver vários negócios ativos para o mesmo contato em funis diferentes, os dados desses funis serão combinados",
+    "user_message": "Existem transações ativas para os contatos especificados"
+  },
+  "settings": {
+    "login": "Conecte-se",
+    "api_key": "Chave API",
+    "account": "Conta"
+  },
+  "advanced": {
+    "title": "Configurações do widget para mesclar negócios ativos",
+    "select_message": "Pesquisar ofertas ativas:",
+    "select_option_1": "em todos os funis de vendas",
+    "select_option_2": "no funil atual",
+    "save_message": "Salvar"
+  },
+  "salesbot": {
+    "button_title": "Título do botão",
+    "button_caption": "Descrição do botão",
+    "button_title_default_value": "Título do botão",
+    "button_caption_default_value": "Descrição do botão",
+    "text": "Texto",
+    "number": "Número",
+    "url": "URL",
+    "handler_name": "Nome do manipulador"
+  },
+  "dp": {
+    "message": "Mensagem"
+  }
+}

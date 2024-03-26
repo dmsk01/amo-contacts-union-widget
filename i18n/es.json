@@ -1,0 +1,34 @@
+{
+  "widget": {
+    "name": "Consolidación de información",
+    "short_description": "Consolidación de información",
+    "description": "Consolidación de información de transacciones duplicadas. Si hay varias ofertas activas para el mismo contacto en diferentes embudos, los datos de estos embudos se combinarán",
+    "tour_description": "Consolidación de información de transacciones duplicadas. Si hay varias ofertas activas para el mismo contacto en diferentes embudos, los datos de estos embudos se combinarán",
+    "user_message": "Hay transacciones activas para los contactos especificados."
+  },
+  "settings": {
+    "login": "Acceso",
+    "api_key": "Clave API",
+    "account": "Cuenta"
+  },
+  "advanced": {
+    "title": "Configuración del widget para fusionar ofertas activas",
+    "select_message": "Buscar ofertas activas:",
+    "select_option_1": "en todos los embudos de ventas",
+    "select_option_2": "en el embudo actual",
+    "save_message": "Ahorrar"
+  },
+  "salesbot": {
+    "button_title": "Título del botón",
+    "button_caption": "Descripción del botón",
+    "button_title_default_value": "Título del botón",
+    "button_caption_default_value": "Descripción del botón",
+    "text": "Texto",
+    "number": "Número",
+    "url": "URL",
+    "handler_name": "Nombre del controlador"
+  },
+  "dp": {
+    "message": "Mensaje"
+  }
+}

@@ -1,0 +1,12 @@
+<form class="advanced-settings" id="{{ widget_code }}__advanced-settings">
+	<div class="{{ widget_code }}__white_block__description">
+		<form action="POST">
+			<label for="search_range">{{ select_message }}</label>
+			<select class="control--select--button" name="search_range" id="search_range">
+				<option selected value="all">{{ select_option_1 }}</option>
+				<option value="current">{{ select_option_2 }}</option>
+			</select>
+			<button>{{ save_message }}</button>
+		</form>
+	</div>
+</form>
