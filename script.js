@@ -23,8 +23,11 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
       current_funnel: "current_funnel",
     };
 
-    this.get_mode = function () {
-      return localStorage.getItem(this.SEARCH_MODE_SETTINGS_KEY);
+    this.get_search_mode = function () {
+      return (
+        localStorage.getItem(this.SEARCH_MODE_SETTINGS_KEY) ||
+        this.SEARCH_MODES_MAP.all_funnels
+      );
     };
 
     this.save_search_mode = function (mode) {
@@ -43,6 +46,18 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
       if ($(".contact-leads-block").length) {
         return;
       }
+
+      let search_mode = this.get_search_mode();
+      let current_card_pipeline_id =
+        AMOCRM.constant("card_element").pipeline_id;
+
+      const filter_search_pipelines = (pipelines_array) => {
+        return pipelines_array.filter((pipeline) => {
+          return search_mode === this.SEARCH_MODES_MAP.all_funnels
+            ? pipeline
+            : pipeline.id === current_card_pipeline_id;
+        });
+      };
 
       let url;
 
@@ -94,7 +109,9 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
             AMOCRM.constant("card_element").status
           );
 
-          for (let pipeline_item of data._embedded.pipelines) {
+          const pipelines = filter_search_pipelines(data._embedded.pipelines);
+
+          for (let pipeline_item of pipelines) {
             let filterPipe = "filter[pipe][" + pipeline_item.id + "][]=";
 
             for (let status of pipeline_item._embedded.statuses) {
@@ -148,7 +165,7 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
         return true;
       },
       init: _.bind(function () {
-        let current_user_mode = this.get_mode();
+        let current_user_mode = this.get_search_mode();
         if (!current_user_mode) {
           this.save_search_mode(this.SEARCH_MODES_MAP.all_funnels);
         }
@@ -221,7 +238,7 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
                 option: self.i18n("advanced").select_option_2,
               },
             ],
-            selected: this.get_mode(),
+            selected: this.get_search_mode(),
           }
         );
 
@@ -239,8 +256,6 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
             const selected_value = $input.val();
 
             self.save_search_mode(selected_value);
-
-            console.log("В настройках выбрано значение ", this.get_mode());
           }
         );
 
