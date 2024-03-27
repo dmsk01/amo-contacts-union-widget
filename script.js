@@ -66,7 +66,7 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
         const html_styles_wide =
           base + "padding:10px 30px; margin: 10px -30px;";
         const html_styles_narrow =
-          base + "padding:10px;margin: 10px; max-width: 280px;";
+          base + "padding:10px; margin: 10px 15px; max-width: 280px;";
         const styles = isWide ? html_styles_wide : html_styles_narrow;
 
         const res = `<div class="bizavdev-contact-leads-card" style='${styles}'>
