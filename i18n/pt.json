@@ -4,7 +4,7 @@
     "short_description": "Consolidação de informações",
     "description": "Consolidação de informações de transações duplicadas. Se houver vários negócios ativos para o mesmo contato em funis diferentes, os dados desses funis serão combinados",
     "tour_description": "Consolidação de informações de transações duplicadas. Se houver vários negócios ativos para o mesmo contato em funis diferentes, os dados desses funis serão combinados",
-    "user_message": "Existem transações ativas para os contatos especificados"
+    "user_message": "Existem transações ativas para este contato"
   },
   "settings": {
     "login": "Conecte-se",

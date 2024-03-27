@@ -61,6 +61,23 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
 
       let url;
 
+      const generate_html = (isWide, html_contacts) => {
+        const base = "background-color: #90e8f0; font-size: 13px; ";
+        const html_styles_wide =
+          base + "padding:10px 30px; margin: 10px -30px;";
+        const html_styles_narrow =
+          base + "padding:10px;margin: 10px; max-width: 280px;";
+        const styles = isWide ? html_styles_wide : html_styles_narrow;
+
+        const res = `<div class="bizavdev-contact-leads-card" style='${styles}'>
+            <span>
+              ${self.langs.widget.user_message}: ${html_contacts}
+            </span>
+          </div>`;
+
+        return res;
+      };
+
       const process_contact_data = (contactData) => {
         if (!Array.isArray(contactData) || !contactData.length) {
           return;
@@ -80,20 +97,23 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
           }
         }
 
-        if (!html_contacts) {
+        const imbox = $(".inbox-messaging-card-holder--header");
+
+        if (!html_contacts || $(".contact-leads-card").length) {
           return;
         }
-
-        const html =
-          '<div class="contact-leads-card" style="position: relative; padding: 10px 30px; ' +
-          'margin: 10px -30px; background-color: #90e8f0; font-size: 13px;">' +
-          "<span>" +
-          self.langs.widget.user_message +
-          ": " +
-          html_contacts +
-          "</span></div>";
-
-        $(".card-fields__top-name-block").after(html);
+        if (!imbox.length) {
+          $(".linked-form__field_status").before(
+            generate_html(true, html_contacts)
+          );
+        } else {
+          $(".inbox-messaging-card-holder--header .linked-form__field_status")
+            .not(".inbox-messaging-card-header__status")
+            .before(generate_html(true, html_contacts));
+          $(
+            ".inbox-messaging-card-holder--header .linked-form__field_status.inbox-messaging-card-header__status"
+          ).before(generate_html(false, html_contacts));
+        }
       };
 
       const is_lead_closed = (id) => {

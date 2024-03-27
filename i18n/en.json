@@ -4,7 +4,7 @@
     "short_description": "Information union",
     "description": "Consolidation of duplicate transaction informatio. If there are multiple active deals for the same contact in different funnels, the data from these funnels will be combined",
     "tour_description": "Consolidation of duplicate transaction informatio. If there are multiple active deals for the same contact in different funnels, the data from these funnels will be combined",
-    "user_message": "There are active transactions for the specified contacts"
+    "user_message": "There are active transactions for this contact"
   },
   "settings": {
     "login": "User login",

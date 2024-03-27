@@ -4,7 +4,7 @@
     "short_description": "Consolidación de información",
     "description": "Consolidación de información de transacciones duplicadas. Si hay varias ofertas activas para el mismo contacto en diferentes embudos, los datos de estos embudos se combinarán",
     "tour_description": "Consolidación de información de transacciones duplicadas. Si hay varias ofertas activas para el mismo contacto en diferentes embudos, los datos de estos embudos se combinarán",
-    "user_message": "Hay transacciones activas para los contactos especificados."
+    "user_message": "Hay transacciones activas para este contacto."
   },
   "settings": {
     "login": "Acceso",
