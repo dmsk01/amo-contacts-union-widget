@@ -14,7 +14,7 @@
       "email": "support@amocrm.com"
     }
   },
-  "locations": ["lcard-1", "advanced_settings"],
+  "locations": ["lcard-1", "settings"],
   "tour": {
     "is_tour": true,
     "tour_images": {
@@ -42,24 +42,16 @@
     "tour_description": "widget.tour_description"
   },
   "settings": {
-    "login": {
-      "name": "settings.login",
+    "user_name": {
+      "name": "settings.user_name",
       "type": "text",
       "required": true
     },
-    "api_key": {
-      "name": "settings.api_key",
-      "type": "text",
-      "required": true
-    },
-    "account": {
-      "name": "settings.account",
+    "phone": {
+      "name": "settings.phone",
       "type": "text",
       "required": true
     }
-  },
-  "advanced": {
-    "title": "advanced.title"
   },
   "salesbot_designer": {
     "handler_code": {

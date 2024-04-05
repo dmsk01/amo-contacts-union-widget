@@ -1,4 +1,8 @@
-define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
+define([
+  "jquery",
+  "underscore",
+  "./lib/widget_status.js",
+], function ($, _, widget_status) {
   let CustomWidget = function () {
     let self = this;
 
@@ -17,26 +21,24 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
       );
     }, this);
 
-    this.SEARCH_MODE_SETTINGS_KEY = "search_mode";
-    this.SEARCH_MODES_MAP = {
-      all_funnels: "all_funnels",
-      current_funnel: "current_funnel",
-    };
+    this.SEARCH_MODE_SETTINGS_KEY =
+      "amo_dd83ldr5ovas6fdp5ynnlfauewyxhbeo6f3nphvd" + "_search_mode";
+    console.log("Self ", self.get_settings(), self);
 
     this.get_search_mode = function () {
-      return (
-        localStorage.getItem(this.SEARCH_MODE_SETTINGS_KEY) ||
-        this.SEARCH_MODES_MAP.all_funnels
-      );
+      return localStorage.getItem(this.SEARCH_MODE_SETTINGS_KEY) || "0";
     };
 
-    this.save_search_mode = function (mode) {
-      if (!mode || !mode in this.SEARCH_MODES_MAP) return;
+    this.set_search_mode = function (mode) {
+      const modes = {
+        0: "all_funnels",
+        1: "current_funnel",
+      };
+
+      if (!mode || !mode in Object.keys(modes)) return;
+
       try {
-        localStorage.setItem(
-          this.SEARCH_MODE_SETTINGS_KEY,
-          this.SEARCH_MODES_MAP[mode]
-        );
+        localStorage.setItem(this.SEARCH_MODE_SETTINGS_KEY, mode);
       } catch (error) {
         console.error("Error saving user search mode ", error);
       }
@@ -47,13 +49,13 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
         return;
       }
 
-      let search_mode = this.get_search_mode();
-      let current_card_pipeline_id =
+      const search_mode = this.get_search_mode();
+      const current_card_pipeline_id =
         AMOCRM.constant("card_element").pipeline_id;
 
       const filter_search_pipelines = (pipelines_array) => {
         return pipelines_array.filter((pipeline) => {
-          return search_mode === this.SEARCH_MODES_MAP.all_funnels
+          return search_mode === "0"
             ? pipeline
             : pipeline.id === current_card_pipeline_id;
         });
@@ -62,14 +64,15 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
       let url;
 
       const generate_html = (isWide, html_contacts) => {
-        const base = "background-color: #90e8f0; font-size: 13px; ";
+        const base =
+          "position: relative; border-radius: 10px; background: linear-gradient(90deg, rgba(255,8,134,1) 0%, rgba(32,60,165,1) 41%, rgba(27,52,70,1) 100%); color: white; font-size: 13px; ";
         const html_styles_wide =
-          base + "padding:10px 30px; margin: 10px -30px;";
+          base + "padding:10px 20px; margin: 10px -20px;";
         const html_styles_narrow =
           base + "padding:10px; margin: 10px 15px; max-width: 280px;";
         const styles = isWide ? html_styles_wide : html_styles_narrow;
 
-        const res = `<div class="bizavdev-contact-leads-card" style='${styles}'>
+        const res = `<div class="bizavdev-contact-notification" style='${styles}'>
             <span>
               ${self.langs.widget.user_message}: ${html_contacts}
             </span>
@@ -86,14 +89,9 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
         let html_contacts = "";
         for (let contact of contactData) {
           if (contact.count > 0) {
-            html_contacts +=
-              '<a style="color: #313942;" href="' +
-              url.substring(5) +
-              '" target="_blank">' +
-              contact.name +
-              " (" +
-              contact.count +
-              ")</a>";
+            html_contacts += `<a style="color: inherit;" href="${url.substring(
+              5
+            )}" target="_blank">${contact.name} (${contact.count})</a>`;
           }
         }
 
@@ -132,7 +130,7 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
           const pipelines = filter_search_pipelines(data._embedded.pipelines);
 
           for (let pipeline_item of pipelines) {
-            let filterPipe = "filter[pipe][" + pipeline_item.id + "][]=";
+            let filterPipe = `filter[pipe][${pipeline_item.id}][]=`;
 
             for (let status of pipeline_item._embedded.statuses) {
               if (!is_lead_closed(status.id)) {
@@ -179,28 +177,85 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
         .catch(console.log);
     };
 
+    self.create_widget_settings = function () {
+      const title = `<h2 style="margin-bottom: 2rem">${
+        self.i18n("advanced").select_message
+      }</h2>`;
+
+      const select = self.render(
+        { ref: "/tmpl/controls/select.twig" },
+        {
+          name: "bizavdev_search_range",
+          class_name: "bizavdev-select-wrapper",
+          items: [
+            {
+              id: "0",
+              option: self.i18n("advanced").select_option_1,
+            },
+            {
+              id: "1",
+              option: self.i18n("advanced").select_option_2,
+            },
+          ],
+          selected: this.get_search_mode(),
+        }
+      );
+
+      const select_wrapper = document.createElement("div");
+      select_wrapper.style.margin = "20px 0";
+      select_wrapper.innerHTML = title + select;
+
+      $(".widget_settings_block__descr").after(select_wrapper);
+
+      $(".bizavdev-select-wrapper").on(
+        "controls:change",
+        "input",
+        function (e) {
+          const $input = $(e.currentTarget);
+          const selected_value = $input.val();
+
+          self.set_search_mode(selected_value);
+        }
+      );
+    };
+
+    self.create_activation_form = function () {
+      // const dto = {
+      //   id: APP.constant('account').id,
+      //   widget_id: self.get_settings().widget_code,
+      //   contacts_name: self.get_settings().user_name,
+      //   phone: self.get_settings().phone,
+      //   email:
+      // }
+      console.log(self.get_settings());
+      window.myself = self;
+      console.log(self);
+    };
+
     this.callbacks = {
       render: function () {
-        console.log("render");
         return true;
       },
       init: _.bind(function () {
+        widget_status(APP.constant("account").id, self).then((data) => {
+          if (data.is_usable && APP.isCard()) {
+            self.render_notification();
+          }
+          console.log("Data from then ", data);
+        });
+
         let current_user_mode = this.get_search_mode();
         if (!current_user_mode) {
-          this.save_search_mode(this.SEARCH_MODES_MAP.all_funnels);
+          this.set_search_mode("0");
         }
 
-        if (APP.isCard()) {
-          self.render_notification();
-        }
-
-        APP.addNotificationCallback(
-          self.get_settings().widget_code,
-          function (data) {
-            console.log(self.get_settings());
-            console.log("APP.addNotificationCallback data ", data);
-          }
-        );
+        // APP.addNotificationCallback(
+        //   self.get_settings().widget_code,
+        //   function (data) {
+        //     console.log(self.get_settings());
+        //     console.log("APP.addNotificationCallback data ", data);
+        //   }
+        // );
 
         return true;
       }, this),
@@ -208,11 +263,13 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
         console.log("bind_actions");
         return true;
       },
-      settings: function () {
+      settings: function ($settings_body, context) {
+        self.create_activation_form();
+        self.create_widget_settings();
         return true;
       },
       onSave: function () {
-        alert("click");
+        console.log("saved");
         return true;
       },
       destroy: function () {},
@@ -231,84 +288,9 @@ define(["jquery", "underscore", "twigjs"], function ($, _, Twig) {
           console.log("tasks");
         },
       },
-      advancedSettings: _.bind(function () {
-        let $work_area = $("#work-area-" + self.get_settings().widget_code);
-
-        console.log("advancedSettings", self.get_settings());
-
-        const save_button = self.render(
-          { ref: "/tmpl/controls/button.twig" },
-          {
-            text: self.i18n("advanced").save_message,
-          }
-        );
-
-        const select = self.render(
-          { ref: "/tmpl/controls/select.twig" },
-          {
-            name: "bizavdev_search_range",
-            class_name: "bizavdev-select-wrapper",
-            items: [
-              {
-                id: "all_funnels",
-                option: self.i18n("advanced").select_option_1,
-              },
-              {
-                id: "current_funnel",
-                option: self.i18n("advanced").select_option_2,
-              },
-            ],
-            selected: this.get_search_mode(),
-          }
-        );
-
-        const title = `<h2 style="margin-bottom: 2rem">${
-          self.i18n("advanced").select_message
-        }</h2>`;
-
-        $work_area.append(title, select);
-
-        $(".bizavdev-select-wrapper").on(
-          "controls:change",
-          "input",
-          function (e) {
-            const $input = $(e.currentTarget);
-            const selected_value = $input.val();
-
-            self.save_search_mode(selected_value);
-          }
-        );
-
-        // const $button = $(".button-input");
-
-        // $button.on("click", () => {
-        //   const range_type = $(".bizavdev_search_range").val();
-        //   console.log(range_type);
-        // });
-      }, self),
+      advancedSettings: _.bind(function () {}, self),
       onSalesbotDesignerSave: function (handler_code, params) {
-        var salesbot_source = {
-            question: [],
-            require: [],
-          },
-          button_caption = params.button_caption || "",
-          button_title = params.button_title || "",
-          text = params.text || "",
-          number = params.number || 0,
-          handler_template = {
-            handler: "show",
-            params: {
-              type: "buttons",
-              value: text + " " + number,
-              buttons: [button_title + " " + button_caption],
-            },
-          };
-
-        console.log(params);
-
-        salesbot_source.question.push(handler_template);
-
-        return JSON.stringify([salesbot_source]);
+        console.log("onSalesbotDesignerSave", handler_code, params);
       },
     };
     return this;

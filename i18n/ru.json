@@ -7,16 +7,16 @@
     "user_message": "Имеются активные сделки по данному контакту"
   },
   "settings": {
-    "login": "Логин",
-    "api_key": "ключ API",
-    "account": "Аккаунт"
+    "user_name": "Имя",
+    "phone": "Ваш номер телефона"
   },
   "advanced": {
     "title": "Настройки виджета объединения активных сделок",
     "select_message": "Осуществлять поиск активных сделок:",
     "select_option_1": "по всем воронкам продаж",
     "select_option_2": "в текущей воронке",
-    "save_message": "Сохранить"
+    "save_message": "Сохранить",
+    "activate_message": "Активировать"
   },
   "salesbot": {
     "button_title": "Заголовок кнопки",

@@ -7,16 +7,16 @@
     "user_message": "There are active transactions for this contact"
   },
   "settings": {
-    "login": "User login",
-    "api_key": "API key",
-    "account": "Account"
+    "user_name": "Name",
+    "phone": "Your phone number"
   },
   "advanced": {
     "title": "Settings for the widget for merging active deals",
     "select_message": "Search for active deals:",
     "select_option_1": "across all sales funnels",
     "select_option_2": "in the current funnel",
-    "save_message": "Save"
+    "save_message": "Save",
+    "activate_message": "Activate"
   },
   "salesbot": {
     "button_title": "Button title",

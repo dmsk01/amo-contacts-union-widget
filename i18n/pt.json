@@ -7,16 +7,16 @@
     "user_message": "Existem transações ativas para este contato"
   },
   "settings": {
-    "login": "Conecte-se",
-    "api_key": "Chave API",
-    "account": "Conta"
+    "user_name": "Nome",
+    "phone": "Seu número de telefone"
   },
   "advanced": {
     "title": "Configurações do widget para mesclar negócios ativos",
     "select_message": "Pesquisar ofertas ativas:",
     "select_option_1": "em todos os funis de vendas",
     "select_option_2": "no funil atual",
-    "save_message": "Salvar"
+    "save_message": "Salvar",
+    "activate_message": "Ativar"
   },
   "salesbot": {
     "button_title": "Título do botão",

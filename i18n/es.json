@@ -7,16 +7,16 @@
     "user_message": "Hay transacciones activas para este contacto."
   },
   "settings": {
-    "login": "Acceso",
-    "api_key": "Clave API",
-    "account": "Cuenta"
+    "user_name": "Nombre",
+    "phone": "Su número de teléfono"
   },
   "advanced": {
     "title": "Configuración del widget para fusionar ofertas activas",
     "select_message": "Buscar ofertas activas:",
     "select_option_1": "en todos los embudos de ventas",
     "select_option_2": "en el embudo actual",
-    "save_message": "Ahorrar"
+    "save_message": "Ahorrar",
+    "activate_message": "Activar"
   },
   "salesbot": {
     "button_title": "Título del botón",
