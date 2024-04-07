@@ -2,7 +2,8 @@ define([
   "jquery",
   "underscore",
   "./lib/widget_status.js",
-], function ($, _, widget_status) {
+  "./lib/account_info.js",
+], function ($, _, widget_status, account_info) {
   let CustomWidget = function () {
     let self = this;
 
@@ -50,6 +51,7 @@ define([
       }
 
       const search_mode = this.get_search_mode();
+      console.log("Self in render notification", self);
       const current_card_pipeline_id =
         AMOCRM.constant("card_element").pipeline_id;
 
@@ -214,7 +216,15 @@ define([
           const $input = $(e.currentTarget);
           const selected_value = $input.val();
 
-          self.set_search_mode(selected_value);
+          const account_id = APP.constant("account").id;
+          const widget_id = self.get_settings().widget_code;
+
+          account_info.change_account_search_mode(
+            account_id,
+            widget_id,
+            selected_value,
+            self.set_search_mode(selected_value)
+          );
         }
       );
     };
@@ -240,14 +250,11 @@ define([
         widget_status(APP.constant("account").id, self).then((data) => {
           if (data.is_usable && APP.isCard()) {
             self.render_notification();
+            self.user_info = data;
           }
           console.log("Data from then ", data);
+          this.set_search_mode(data.settings_pipeline);
         });
-
-        let current_user_mode = this.get_search_mode();
-        if (!current_user_mode) {
-          this.set_search_mode("0");
-        }
 
         // APP.addNotificationCallback(
         //   self.get_settings().widget_code,
