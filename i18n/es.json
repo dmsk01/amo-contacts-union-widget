@@ -17,7 +17,7 @@
     "select_option_2": "en el embudo actual",
     "save_message": "Ahorrar",
     "activate_message": "Activar",
-    "select_payment_message": "Pago requerido"
+    "select_payment_message": "El período de prueba para usar el widget ha expirado. Para renovar tu suscripción, puedes contactar con soporte"
   },
   "salesbot": {
     "button_title": "Título del botón",

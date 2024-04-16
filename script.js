@@ -177,8 +177,55 @@ define([
         .catch(console.log);
     };
 
+    this.remove_spaces = function (str) {
+      return str.replace(/[\s-]/g, "").replace(/^[\s-]+|[\s-]+$/g, "");
+    };
+
+    self.is_phone_number_valid = function (phone) {
+      const phoneUtil = google_phonenumber.PhoneNumberUtil.getInstance();
+      const lang = APP.lang_id.toUpperCase();
+      let number = phoneUtil.parseAndKeepRawInput(
+        this.remove_spaces(phone),
+        lang
+      );
+
+      return phoneUtil.isValidNumber(number);
+    };
+
+    self.add_error_border = function (
+      activation_input,
+      save_button,
+      condition
+    ) {
+      if (condition) {
+        save_button
+          .prop("disabled", false)
+          .removeClass("button-input-disabled")
+          .addClass("button-input_blue");
+        activation_input.prop("style", "outline: 1px solid transparent");
+      } else {
+        save_button
+          .prop("disabled", true)
+          .addClass("button-input-disabled")
+          .removeClass("button-input_blue");
+        activation_input.prop("style", "outline: 1px solid #ff7779");
+      }
+    };
+
+    self.check_phone_input = function () {
+      const activation_input = $(".widget_settings_block input[name=phone]");
+      const save_button = $("button.js-widget-save");
+
+      const phone = activation_input.val();
+
+      const is_valid = self.is_phone_number_valid(phone);
+      self.add_error_border(activation_input, save_button, is_valid);
+
+      return is_valid;
+    };
+
     self.create_widget_settings = function ($settings_body) {
-      const title = `<h2 style="margin-bottom: 2rem">${
+      const title = `<h2 style="margin-bottom: 0.5rem">${
         self.i18n("advanced").select_message
       }</h2>`;
 
@@ -200,14 +247,22 @@ define([
           selected: this.get_search_mode(),
         }
       );
+      const close_button = self.render(
+        { ref: "/tmpl/controls/button.twig" },
+        {
+          name: "close_button",
+          text: self.i18n("advanced").save_message,
+          blue: true,
+        }
+      );
 
       const select_wrapper = document.createElement("div");
       select_wrapper.classList.add("bizavdev_widget_options");
-      select_wrapper.style.margin = "20px 0";
-      select_wrapper.innerHTML = title + select;
+      select_wrapper.style.cssText =
+        "margin: 20px 0; display:flex; flex-direction: column; row-gap: 20px; align-items: flex-start; min-width: 215px";
+      select_wrapper.innerHTML = title + select + close_button;
 
       $settings_body.append(select_wrapper);
-      // $(".widget_settings_block").after(select_wrapper);
 
       $(".bizavdev-select-wrapper").on(
         "controls:change",
@@ -223,6 +278,14 @@ define([
           );
         }
       );
+      $(".bizavdev_widget_options button.button-input").on(
+        "click",
+        function () {
+          $(
+            `.widget-settings__modal.${self.get_settings().widget_code}`
+          ).remove();
+        }
+      );
     };
 
     self.hide_activatation_setting = function ($settings_body) {
@@ -233,12 +296,9 @@ define([
     };
 
     self.activation_form_processing = function ($settings_body) {
-      let phone = $(".widget_settings_block input[name=phone]").val();
-      const phoneUtil = google_phonenumber.PhoneNumberUtil.getInstance();
-      number = phoneUtil.parseAndKeepRawInput(phone, APP.lang_id.toUpperCase());
-      window.googphone = google_phonenumber;
-      console.log("Number", number, phoneUtil.isValidNumber(number));
-
+      let phone = this.remove_spaces(
+        $(".widget_settings_block input[name=phone]").val()
+      );
       const user_data = {
         widget_id: self.get_settings().widget_code,
         phone,
@@ -246,10 +306,7 @@ define([
       };
 
       if (user_data) {
-        account_info.save_info(
-          user_data,
-          self.hide_activatation_setting($settings_body)
-        );
+        account_info.save_info(user_data);
       }
     };
 
@@ -306,14 +363,6 @@ define([
           }
         });
 
-        // APP.addNotificationCallback(
-        //   self.get_settings().widget_code,
-        //   function (data) {
-        //     console.log(self.get_settings());
-        //     console.log("APP.addNotificationCallback data ", data);
-        //   }
-        // );
-
         return true;
       }, this),
       bind_actions: function () {
@@ -321,10 +370,18 @@ define([
         return true;
       },
       settings: function ($settings_body, context) {
-        console.log("self from settings", self);
-        window.my = self;
+        const activation_input = $(".widget_settings_block input[name=phone]");
+        self.check_phone_input();
 
-        if (!self.user_info.is_usable) {
+        ["change", "blur", "focus"].forEach((event) =>
+          activation_input.on(event, () => self.check_phone_input())
+        );
+
+        if (
+          self.user_info &&
+          self.user_info !== 404 &&
+          !self.user_info.is_usable
+        ) {
           $(".bizavdev_widget_options").hide();
           self.create_payment_form($settings_body);
         }
@@ -347,7 +404,9 @@ define([
         return true;
       },
       onSave: function () {
-        self.activation_form_processing($(".widget-settings__desc-space"));
+        if (self.check_phone_input()) {
+          self.activation_form_processing($(".widget-settings__desc-space"));
+        }
         console.log("saved");
         return true;
       },

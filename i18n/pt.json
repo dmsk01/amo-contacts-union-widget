@@ -17,7 +17,7 @@
     "select_option_2": "no funil atual",
     "save_message": "Salvar",
     "activate_message": "Ativar",
-    "select_payment_message": "Pagamento Requerido"
+    "select_payment_message": "O período de teste para usar o widget expirou. Para renovar sua assinatura, você pode entrar em contato com o suporte"
   },
   "salesbot": {
     "button_title": "Título do botão",

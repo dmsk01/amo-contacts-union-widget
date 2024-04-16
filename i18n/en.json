@@ -17,7 +17,7 @@
     "select_option_2": "in the current funnel",
     "save_message": "Save",
     "activate_message": "Activate",
-    "select_payment_message": "Payment required"
+    "select_payment_message": "The trial period for using the widget has expired. To renew your subscription, you can contact support"
   },
   "salesbot": {
     "button_title": "Button title",
