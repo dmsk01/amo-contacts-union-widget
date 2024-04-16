@@ -16,7 +16,8 @@
     "select_option_1": "en todos los embudos de ventas",
     "select_option_2": "en el embudo actual",
     "save_message": "Ahorrar",
-    "activate_message": "Activar"
+    "activate_message": "Activar",
+    "select_payment_message": "Pago requerido"
   },
   "salesbot": {
     "button_title": "Título del botón",

@@ -42,11 +42,6 @@
     "tour_description": "widget.tour_description"
   },
   "settings": {
-    "user_name": {
-      "name": "settings.user_name",
-      "type": "text",
-      "required": true
-    },
     "phone": {
       "name": "settings.phone",
       "type": "text",

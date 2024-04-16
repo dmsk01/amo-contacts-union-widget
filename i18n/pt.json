@@ -16,7 +16,8 @@
     "select_option_1": "em todos os funis de vendas",
     "select_option_2": "no funil atual",
     "save_message": "Salvar",
-    "activate_message": "Ativar"
+    "activate_message": "Ativar",
+    "select_payment_message": "Pagamento Requerido"
   },
   "salesbot": {
     "button_title": "Título do botão",

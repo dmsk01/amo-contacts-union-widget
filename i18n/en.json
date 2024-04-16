@@ -16,7 +16,8 @@
     "select_option_1": "across all sales funnels",
     "select_option_2": "in the current funnel",
     "save_message": "Save",
-    "activate_message": "Activate"
+    "activate_message": "Activate",
+    "select_payment_message": "Payment required"
   },
   "salesbot": {
     "button_title": "Button title",
