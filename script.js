@@ -1,10 +1,9 @@
 define([
   "jquery",
   "underscore",
-  "google-libphonenumber",
   "./lib/widget_status.js",
   "./lib/account_info.js",
-], function ($, _, google_phonenumber, widget_status, account_info) {
+], function ($, _, widget_status, account_info) {
   let CustomWidget = function () {
     let self = this;
     self.account_id = APP.constant("account").id;
@@ -181,15 +180,13 @@ define([
       return str.replace(/[\s-]/g, "").replace(/^[\s-]+|[\s-]+$/g, "");
     };
 
-    self.is_phone_number_valid = function (phone) {
-      const phoneUtil = google_phonenumber.PhoneNumberUtil.getInstance();
-      const lang = APP.lang_id.toUpperCase();
-      let number = phoneUtil.parseAndKeepRawInput(
-        this.remove_spaces(phone),
-        lang
-      );
-
-      return phoneUtil.isValidNumber(number);
+    self.is_phone_number_valid = function (inputtxt) {
+      const phoneno = /^[\s()+-]*([0-9][\s()+-]*){6,20}$/;
+      if (phoneno.test(inputtxt)) {
+        return true;
+      } else {
+        return false;
+      }
     };
 
     self.add_error_border = function (
@@ -295,7 +292,7 @@ define([
       widget_settings_block.hide();
     };
 
-    self.activation_form_processing = function ($settings_body) {
+    self.activation_form_processing = function () {
       let phone = this.remove_spaces(
         $(".widget_settings_block input[name=phone]").val()
       );
@@ -306,8 +303,26 @@ define([
       };
 
       if (user_data) {
-        account_info.save_info(user_data);
+        account_info.save_info(user_data).then(() => self.get_widget_status());
       }
+    };
+
+    self.get_widget_status = function () {
+      widget_status(self).then((data) => {
+        self.user_info = data;
+        if (data.is_usable && APP.isCard()) {
+          self.render_notification();
+        }
+        this.set_search_mode(data.settings_pipeline);
+
+        if (data !== 404 && !data.is_usable) {
+          APP.notifications.add_error({
+            header: self.langs.widget.name,
+            text: "Истек период пользования виджета. Перейти к оплате",
+            link: "/settings/widgets/#" + self.get_settings().widget_code,
+          });
+        }
+      });
     };
 
     self.create_payment_form = function ($settings_body) {
@@ -347,21 +362,7 @@ define([
         return true;
       },
       init: _.bind(function () {
-        widget_status(self).then((data) => {
-          self.user_info = data;
-          if (data.is_usable && APP.isCard()) {
-            self.render_notification();
-          }
-          this.set_search_mode(data.settings_pipeline);
-
-          if (!data.is_usable) {
-            APP.notifications.add_error({
-              header: self.langs.widget.name,
-              text: "Истек период пользования виджета. Перейти к оплате",
-              link: "/settings/widgets/#" + self.get_settings().widget_code,
-            });
-          }
-        });
+        self.get_widget_status();
 
         return true;
       }, this),
@@ -372,6 +373,9 @@ define([
       settings: function ($settings_body, context) {
         const activation_input = $(".widget_settings_block input[name=phone]");
         self.check_phone_input();
+        window.myself = self;
+        console.log("self in settings", self);
+        console.log($settings_body);
 
         ["change", "blur", "focus"].forEach((event) =>
           activation_input.on(event, () => self.check_phone_input())
@@ -404,8 +408,11 @@ define([
         return true;
       },
       onSave: function () {
-        if (self.check_phone_input()) {
-          self.activation_form_processing($(".widget-settings__desc-space"));
+        if (
+          self.check_phone_input() &&
+          self.get_settings().status === "not_configured"
+        ) {
+          self.activation_form_processing();
         }
         console.log("saved");
         return true;
