@@ -25,7 +25,6 @@ define([
 
     this.SEARCH_MODE_SETTINGS_KEY =
       "amo_dd83ldr5ovas6fdp5ynnlfauewyxhbeo6f3nphvd" + "_search_mode";
-    console.log("Self ", self.get_settings(), self);
 
     this.get_search_mode = function () {
       return localStorage.getItem(this.SEARCH_MODE_SETTINGS_KEY) || "0";
@@ -42,7 +41,7 @@ define([
       try {
         localStorage.setItem(this.SEARCH_MODE_SETTINGS_KEY, mode);
       } catch (error) {
-        console.error("Error saving user search mode ", error);
+        throw new Error("Error saving user search mode. " + error);
       }
     };
 
@@ -92,7 +91,7 @@ define([
           if (contact.count > 0) {
             html_contacts += `<a style="color: inherit;" href="${url.substring(
               5
-            )}" target="_blank">${contact.name} (${contact.count})</a>`;
+            )}" target="_blank">${contact.name} (${contact.count})</a>, `;
           }
         }
 
@@ -101,6 +100,7 @@ define([
         if (!html_contacts || $(".contact-leads-card").length) {
           return;
         }
+        html_contacts = html_contacts.slice(0, -2);
         if (!imbox.length) {
           $(".linked-form__field_status").before(
             generate_html(true, html_contacts)
@@ -158,7 +158,6 @@ define([
                 data: filter_data,
               }).then(function (data) {
                 data = JSON.parse(data);
-                console.log("data from jquery after parse", data);
                 let count =
                   data["response"]["summary"]["count"] - (is_closed ? 0 : 1);
 
@@ -173,7 +172,9 @@ define([
           return Promise.all(requests);
         })
         .then(process_contact_data)
-        .catch(console.log);
+        .catch((err) => {
+          throw new Error(err);
+        });
     };
 
     this.remove_spaces = function (str) {
@@ -327,31 +328,16 @@ define([
 
     self.create_payment_form = function ($settings_body) {
       const title = `
-      <h4 style="font-weight: bold">
-        <a target="_blank" href="https://wa.me/79234226700?text=%D0%9F%D1%80%D0%B8%D0%B2%D0%B5%D1%82!%20%F0%9F%91%8B%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D1%80%D0%BE%D0%B4%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%D0%B8%D0%B4%D0%B6%D0%B5%D1%82%D0%B0%20%D0%B2%20amoCRM" style="text-decoration:none; color:#363b44; white-space: pre-line">
-        <span style="display:block; font-size: 1.5rem; font-weight:normal">${
-          self.i18n("advanced").select_payment_message
-        }:</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              xml:space="preserve"
-              viewBox="0 0 455.731 455.731"
-              width="60px"
-              height="60px"
-              style="border-radius: 10px"
-            >
-              <path d="M0 0h455.731v455.731H0z" style="fill:#1bd741" />
-              <path
-                d="m68.494 387.41 22.323-79.284c-14.355-24.387-21.913-52.134-21.913-80.638 0-87.765 71.402-159.167 159.167-159.167s159.166 71.402 159.166 159.167-71.401 159.167-159.166 159.167c-27.347 0-54.125-7-77.814-20.292L68.494 387.41zm85.943-50.004 4.872 2.975c20.654 12.609 44.432 19.274 68.762 19.274 72.877 0 132.166-59.29 132.166-132.167S300.948 95.321 228.071 95.321 95.904 154.611 95.904 227.488c0 25.393 7.217 50.052 20.869 71.311l3.281 5.109-12.855 45.658 47.238-12.16z"
-                style="fill:#fff"
-              />
-              <path
-                d="m183.359 153.407-10.328-.563a12.49 12.49 0 0 0-8.878 3.037c-5.007 4.348-13.013 12.754-15.472 23.708-3.667 16.333 2 36.333 16.667 56.333 14.667 20 42 52 90.333 65.667 15.575 4.404 27.827 1.435 37.28-4.612 7.487-4.789 12.648-12.476 14.508-21.166l1.649-7.702a5.35 5.35 0 0 0-2.993-5.98L271.22 246.04a5.352 5.352 0 0 0-6.477 1.591l-13.703 17.764a3.921 3.921 0 0 1-4.407 1.312c-9.384-3.298-40.818-16.463-58.066-49.687a3.96 3.96 0 0 1 .499-4.419l13.096-15.15a5.35 5.35 0 0 0 .872-5.602l-15.046-35.201a5.352 5.352 0 0 0-4.629-3.241z"
-                style="fill:#fff"
-              />
-            </svg>
-          </a>
-      </h4>
+      <p>${self.i18n("advanced").select_payment_message}
+        <a target="_blank"
+          href="https://wa.me/79234226700?text=%D0%9F%D1%80%D0%B8%D0%B2%D0%B5%D1%82!%20%F0%9F%91%8B%20%D0%9C%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D0%BF%D1%80%D0%BE%D0%B4%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%D0%B8%D0%B4%D0%B6%D0%B5%D1%82%D0%B0%20%D0%B2%20amoCRM"
+          style="text-decoration:none; color:#363b44;">WhatsApp </a>
+          ${self.i18n("advanced").or_payment_message}
+        <a target="_blank" href="https://t.me/bizavr" style="text-decoration:none; color:#363b44;">Telegram </a>
+        ${self.i18n("advanced").number_payment_message}
+        <a target="_blank" href="tel:+79234226700" style="text-decoration:none; color:#363b44;">+79234226700</a>
+      </p>
+      <p>${self.i18n("advanced").support_payment_message} <a target="_blank" href="https://t.me/BizavHelp_Bot" style="text-decoration:none; color:#363b44;">@BizavHelp_Bot</a></p>
       `;
 
       $settings_body.append(title);
@@ -367,15 +353,11 @@ define([
         return true;
       }, this),
       bind_actions: function () {
-        console.log("bind_actions");
         return true;
       },
       settings: function ($settings_body, context) {
         const activation_input = $(".widget_settings_block input[name=phone]");
         self.check_phone_input();
-        window.myself = self;
-        console.log("self in settings", self);
-        console.log($settings_body);
 
         ["change", "blur", "focus"].forEach((event) =>
           activation_input.on(event, () => self.check_phone_input())
@@ -414,29 +396,20 @@ define([
         ) {
           self.activation_form_processing();
         }
-        console.log("saved");
         return true;
       },
       destroy: function () {},
       contacts: {
-        selected: function () {
-          console.log("contacts");
-        },
+        selected: function () {},
       },
       leads: {
-        selected: function () {
-          console.log("leads");
-        },
+        selected: function () {},
       },
       tasks: {
-        selected: function () {
-          console.log("tasks");
-        },
+        selected: function () {},
       },
       advancedSettings: _.bind(function () {}, self),
-      onSalesbotDesignerSave: function (handler_code, params) {
-        console.log("onSalesbotDesignerSave", handler_code, params);
-      },
+      onSalesbotDesignerSave: function (handler_code, params) {},
     };
     return this;
   };
